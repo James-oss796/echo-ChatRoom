@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#111827">
+  <title>Echo — conversations that feel alive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{color-scheme:dark;--bg:#0b1020;--panel:#11182b;--panel2:#172139;--line:#27334b;--text:#eef3ff;--muted:#91a0bb;--accent:#8b7cff;--accent2:#5ce1c1;--bubble-in:#1b2740;--shadow:0 24px 70px #0005}
+    [data-theme="light"]{color-scheme:light;--bg:#eef1f8;--panel:#fff;--panel2:#f4f6fc;--line:#e1e6f0;--text:#182238;--muted:#74809a;--accent:#6655e8;--accent2:#008d76;--bubble-in:#f0f3fa;--shadow:0 24px 70px #1b2a4818}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 10% 0%,color-mix(in srgb,var(--accent) 15%,transparent),transparent 34%),var(--bg);color:var(--text);font-family:"DM Sans",sans-serif;height:100dvh;overflow:hidden}
+    button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+    .shell{height:100dvh;max-width:1500px;margin:auto;padding:18px;display:grid;grid-template-columns:320px minmax(0,1fr);gap:16px}
+    .sidebar,.chat{min-height:0;border:1px solid var(--line);border-radius:24px;background:color-mix(in srgb,var(--panel) 94%,transparent);box-shadow:var(--shadow);overflow:hidden}
+    .sidebar{display:flex;flex-direction:column}.brandbar{padding:22px 20px 18px;display:flex;align-items:center;justify-content:space-between}
+    .brand{display:flex;align-items:center;gap:11px}.brand img{width:42px;height:42px}.brandname{font:800 22px Manrope,sans-serif;letter-spacing:-1px}.tagline{font-size:11px;color:var(--muted);margin-top:1px}
+    .iconbtn{border:1px solid var(--line);background:var(--panel2);color:var(--text);width:38px;height:38px;border-radius:13px;display:grid;place-items:center;transition:transform .18s,border-color .18s}.iconbtn:hover{transform:translateY(-2px);border-color:var(--accent)}.iconbtn svg{width:18px;height:18px}
+    .me{margin:0 14px 16px;padding:12px;border:1px solid var(--line);background:var(--panel2);border-radius:17px;display:flex;align-items:center;gap:11px}
+    .avatar{width:42px;height:42px;border-radius:15px;object-fit:cover;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;color:white;font-weight:800;flex-shrink:0}.me-info{min-width:0;flex:1}.me-name{font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.me-status{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;margin-top:3px}.dot{width:7px;height:7px;background:#3bd7a6;border-radius:50%;box-shadow:0 0 0 3px #3bd7a61c}
+    .sectionlabel{padding:0 20px 10px;color:var(--muted);font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}.roomlist{padding:0 10px;display:grid;gap:5px}.room{width:100%;display:flex;gap:12px;align-items:center;text-align:left;padding:12px;border:1px solid transparent;background:transparent;color:var(--text);border-radius:16px;transition:.18s}.room:hover{background:var(--panel2)}.room.active{background:color-mix(in srgb,var(--accent) 13%,var(--panel2));border-color:color-mix(in srgb,var(--accent) 30%,var(--line))}.roomicon{width:44px;height:44px;display:grid;place-items:center;border-radius:15px;background:var(--panel2);color:var(--accent2);flex-shrink:0}.room.active .roomicon{background:var(--accent);color:white}.roomicon svg{width:21px;height:21px}.roomcopy{min-width:0;flex:1}.roomtitle{font-size:14px;font-weight:700}.roomdesc{font-size:11px;color:var(--muted);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .sidebarfoot{margin-top:auto;padding:16px 18px 18px;border-top:1px solid var(--line);font-size:11px;line-height:1.6;color:var(--muted)}.sidebarfoot strong{color:var(--text)}
+    .chat{display:flex;flex-direction:column;position:relative}.chathead{padding:17px 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;background:color-mix(in srgb,var(--panel) 96%,transparent)}.backbtn{display:none}.room-head-icon{width:44px;height:44px;border-radius:15px;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 16%,var(--panel2));color:var(--accent)}.room-head-icon svg{width:23px}.headcopy{min-width:0;flex:1}.headcopy h1{font:800 17px Manrope,sans-serif;margin:0;letter-spacing:-.4px}.headcopy p{font-size:12px;color:var(--muted);margin:4px 0 0}.headactions{display:flex;gap:8px}
+    .feed{flex:1;overflow-y:auto;padding:25px clamp(14px,4vw,48px);scroll-behavior:smooth;background-image:radial-gradient(color-mix(in srgb,var(--muted) 11%,transparent) .8px,transparent .8px);background-size:18px 18px}
+    .welcome{max-width:500px;margin:25px auto 28px;text-align:center;animation:rise .45s ease both}.welcome-mark{width:58px;height:58px;margin:auto auto 14px;border-radius:20px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),#4ccfb4);box-shadow:0 10px 30px color-mix(in srgb,var(--accent) 25%,transparent)}.welcome-mark img{width:38px}.welcome h2{font:800 21px Manrope,sans-serif;margin:0 0 8px;letter-spacing:-.6px}.welcome p{color:var(--muted);font-size:13px;line-height:1.65;margin:0}
+    .daydivider{text-align:center;margin:18px 0 22px;color:var(--muted);font-size:10px;letter-spacing:1px;text-transform:uppercase}.message-row{display:flex;align-items:flex-end;gap:9px;margin:0 0 14px;animation:rise .22s ease both}.message-row.mine{justify-content:flex-end}.msg-avatar{width:30px;height:30px;border-radius:11px;object-fit:cover;background:var(--panel2);display:grid;place-items:center;font-size:11px;font-weight:800;color:var(--accent2);flex-shrink:0}.bubble-wrap{max-width:min(72%,560px)}.sender{font-size:11px;color:var(--muted);margin:0 0 5px 3px}.bubble{padding:11px 14px;border:1px solid var(--line);border-radius:5px 17px 17px 17px;background:var(--bubble-in);font-size:14px;line-height:1.55;overflow-wrap:anywhere;white-space:pre-wrap}.mine .bubble{background:linear-gradient(135deg,var(--accent),color-mix(in srgb,var(--accent) 70%,#4c9bde));border-color:transparent;color:white;border-radius:17px 5px 17px 17px}.meta{display:flex;gap:6px;align-items:center;justify-content:flex-end;font-size:10px;color:var(--muted);margin:5px 3px 0}.mine .meta{color:var(--muted)}.empty{color:var(--muted);font-size:13px;text-align:center;padding:18px}
+    .composer-wrap{padding:14px 20px 18px;border-top:1px solid var(--line);background:var(--panel)}.connectrow{display:flex;gap:8px;align-items:center;margin-bottom:10px}.nameinput,.messageinput{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:14px;padding:12px 14px;min-width:0;outline:none;transition:border-color .2s}.nameinput:focus,.messageinput:focus{border-color:var(--accent)}.nameinput{width:180px;font-size:13px}.connectbtn{border:0;border-radius:13px;background:var(--accent);color:white;font-weight:700;padding:12px 17px;font-size:13px;white-space:nowrap;transition:filter .2s,transform .2s}.connectbtn:hover{filter:brightness(1.1);transform:translateY(-1px)}.connectbtn:disabled{opacity:.6;cursor:default;transform:none}.connecthint{font-size:11px;color:var(--muted);margin-left:auto}.sendrow{display:flex;gap:9px;align-items:center}.messageinput{flex:1;font-size:14px;padding:14px 16px;border-radius:16px}.sendbtn{width:49px;height:49px;border:0;border-radius:16px;background:linear-gradient(135deg,var(--accent),#6d9dff);color:white;display:grid;place-items:center;box-shadow:0 8px 22px color-mix(in srgb,var(--accent) 24%,transparent);transition:transform .18s}.sendbtn:hover{transform:translateY(-2px) rotate(-3deg)}.sendbtn:disabled{opacity:.45;box-shadow:none;cursor:not-allowed}.sendbtn svg{width:21px}.smallnote{font-size:10px;color:var(--muted);margin:9px 3px 0}.mobile-only{display:none}
+    .toast{position:absolute;left:50%;bottom:110px;transform:translate(-50%,12px);background:var(--text);color:var(--bg);padding:10px 14px;border-radius:12px;font-size:12px;opacity:0;pointer-events:none;transition:.2s;z-index:4;white-space:nowrap}.toast.show{opacity:1;transform:translate(-50%,0)}
+    @keyframes rise{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+    @media(max-width:760px){.shell{padding:0;display:block;height:100dvh}.sidebar,.chat{border-radius:0;border:0;height:100dvh;box-shadow:none}.sidebar{position:absolute;inset:0;z-index:2}.chat{position:absolute;inset:0;z-index:1}.shell.room-open .sidebar{display:none}.shell:not(.room-open) .chat{display:none}.mobile-only{display:grid}.brandbar{padding:20px 18px 16px}.chathead{padding:13px 14px}.headcopy h1{font-size:16px}.feed{padding:18px 13px}.bubble-wrap{max-width:84%}.composer-wrap{padding:12px 12px max(13px,env(safe-area-inset-bottom))}.connectrow{flex-wrap:wrap}.nameinput{flex:1;width:auto}.connecthint{width:100%;margin-left:2px}.chathead .headactions .iconbtn{width:35px;height:35px}.welcome{margin:18px auto 22px}.sidebarfoot{padding-bottom:max(18px,env(safe-area-inset-bottom))}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+  </style>
+</head>
+<body>
+<div class="shell" id="shell">
+  <aside class="sidebar" aria-label="Chat rooms">
+    <div class="brandbar">
+      <div class="brand"><img src="/echo.svg" alt="Echo logo"><div><div class="brandname">echo<span style="color:var(--accent)">.</span></div><div class="tagline">A little more human.</div></div></div>
+      <button class="iconbtn" id="themeToggle" aria-label="Toggle theme" title="Toggle theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.5 14.1A8.4 8.4 0 0 1 9.9 3.5 8.5 8.5 0 1 0 20.5 14.1Z"/></svg></button>
+    </div>
+    <div class="me">
+      <img class="avatar" id="myAvatar" alt="Your profile picture" src="" style="display:none">
+      <div class="avatar" id="myAvatarFallback">E</div>
+      <div class="me-info"><div class="me-name" id="profileName">Your profile</div><div class="me-status"><span class="dot"></span><span id="statusText">Not connected</span></div></div>
+      <button class="iconbtn" id="avatarButton" title="Change profile picture" aria-label="Change profile picture"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h3l2-2h6l2 2h3v12H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
+      <input id="avatarFile" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+    </div>
+    <div class="sectionlabel">Your spaces</div>
+    <nav class="roomlist" id="roomList">
+      <button class="room active" data-room="general"><span class="roomicon">#</span><span class="roomcopy"><span class="roomtitle">General</span><span class="roomdesc">The main room</span></span></button>
+      <button class="room" data-room="tech"><span class="roomicon">⌘</span><span class="roomcopy"><span class="roomtitle">Tech & Build</span><span class="roomdesc">Code, ideas and projects</span></span></button>
+      <button class="room" data-room="random"><span class="roomicon">✳</span><span class="roomcopy"><span class="roomtitle">Off Topic</span><span class="roomdesc">Everything else</span></span></button>
+    </nav>
+    <div class="sidebarfoot"><strong>Good conversations travel.</strong><br>Keep it kind. Keep it real.</div>
+  </aside>
+
+  <main class="chat">
+    <header class="chathead">
+      <button class="iconbtn mobile-only backbtn" id="backButton" aria-label="Back to rooms"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg></button>
+      <div class="room-head-icon" id="roomHeadIcon">#</div>
+      <div class="headcopy"><h1 id="roomTitle">General</h1><p id="roomSubtitle">A place to start a conversation</p></div>
+      <div class="headactions"><button class="iconbtn" id="themeToggleMobile" aria-label="Toggle theme" title="Toggle theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.5 14.1A8.4 8.4 0 0 1 9.9 3.5 8.5 8.5 0 1 0 20.5 14.1Z"/></svg></button></div>
+    </header>
+    <section class="feed" id="messages" aria-live="polite">
+      <div class="welcome" id="welcome"><div class="welcome-mark"><img src="/echo.svg" alt=""></div><h2>Make yourself at home.</h2><p>Drop a thought, ask a question, or just say hello. Good conversations start small.</p></div>
+    </section>
+    <div class="composer-wrap">
+      <div class="connectrow">
+        <input class="nameinput" id="name" maxlength="80" placeholder="What should we call you?" autocomplete="nickname" aria-label="Your display name">
+        <button class="connectbtn" id="connectButton">Join chat</button>
+        <span class="connecthint" id="connectHint">Choose a name to join</span>
+      </div>
+      <form class="sendrow" id="sendForm">
+        <input class="messageinput" id="message" maxlength="2000" placeholder="Write something worth sharing…" autocomplete="off" aria-label="Message" disabled>
+        <button class="sendbtn" id="sendButton" aria-label="Send message" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></button>
+      </form>
+      <div class="smallnote">Enter to send · Be decent to each other.</div>
+    </div>
+    <div class="toast" id="toast" role="status"></div>
+  </main>
+</div>
+<script>
+  // Set these two values to enable Supabase avatar uploads. Never use the service-role key here.
+  const SUPABASE_URL = "https://ssqdgwsgykmlywlbdhca.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_s7jKxC7Wxktv-NNjijO9LA_ut5BTde2";
+  const AVATAR_BUCKET = "echo-avatars";
+
+  const shell = document.getElementById("shell");
+  const messageFeed = document.getElementById("messages");
+  const nameInput = document.getElementById("name");
+  const messageInput = document.getElementById("message");
+  const connectButton = document.getElementById("connectButton");
+  const sendButton = document.getElementById("sendButton");
+  const statusText = document.getElementById("statusText");
+  const connectHint = document.getElementById("connectHint");
+  const toast = document.getElementById("toast");
+  let ws = null, currentUser = "", avatarUrl = "", currentRoom = "general", joined = false;
+  const rooms = {
+    general: {name:"General",description:"A place to start a conversation",icon:"#"},
+    tech: {name:"Tech & Build",description:"Code, ideas and projects",icon:"⌘"},
+    random: {name:"Off Topic",description:"A room for everything else",icon:"✳"}
+  };
+
+  function notify(text) {
+    toast.textContent = text; toast.classList.add("show");
+    clearTimeout(notify.timer); notify.timer = setTimeout(() => toast.classList.remove("show"), 2400);
+  }
+  function initials(text) { return (text || "E").trim().split(/\s+/).slice(0,2).map(s=>s[0]||"").join("").toUpperCase() || "E"; }
+  function escapeText(text) { return String(text ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+  function avatarMarkup(url, name, className) {
+    if (url) return `<img class="${className}" src="${escapeText(url)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'${className}',textContent:'${escapeText(initials(name))}'}))">`;
+    return `<span class="${className}">${escapeText(initials(name))}</span>`;
+  }
+  function setAvatar(url) {
+    avatarUrl = url || "";
+    const img = document.getElementById("myAvatar"), fallback = document.getElementById("myAvatarFallback");
+    if (avatarUrl) { img.src = avatarUrl; img.style.display = "block"; fallback.style.display = "none"; }
+    else { img.style.display = "none"; fallback.style.display = "grid"; fallback.textContent = initials(currentUser || "E"); }
+  }
+  function updateStatus(connected, text) {
+    statusText.textContent = text;
+    connectHint.textContent = connected ? "You're in" : text;
+    document.querySelector(".dot").style.background = connected ? "#3bd7a6" : "#e6a84b";
+  }
+  function clearMessages() {
+    messageFeed.innerHTML = `<div class="welcome" id="welcome"><div class="welcome-mark"><img src="/echo.svg" alt=""></div><h2>Welcome to ${escapeText(rooms[currentRoom].name)}.</h2><p>Drop a thought, ask a question, or just say hello. Good conversations start small.</p></div>`;
+  }
+  function addMessage(msg) {
+    if (msg.roomId && msg.roomId !== currentRoom) return;
+    const welcome = document.getElementById("welcome"); if (welcome) welcome.remove();
+    const mine = (msg.name || "") === currentUser;
+    const row = document.createElement("div");
+    row.className = "message-row" + (mine ? " mine" : "");
+    const time = msg.createdAt ? new Date(msg.createdAt) : new Date();
+    const timeText = isNaN(time.getTime()) ? "" : time.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
+    const avatar = avatarMarkup(msg.avatarUrl || "", msg.name, "msg-avatar");
+    row.innerHTML = `${mine ? "" : avatar}<div class="bubble-wrap">${mine ? "" : `<div class="sender">${escapeText(msg.name || "Guest")}</div>`}<div class="bubble">${escapeText(msg.message)}</div><div class="meta"><span>${timeText}</span>${mine ? "<span>·</span><span>you</span>" : ""}</div></div>${mine ? avatar : ""}`;
+    messageFeed.appendChild(row); messageFeed.scrollTop = messageFeed.scrollHeight;
+  }
+  async function loadHistory() {
+    try {
+      const response = await fetch(`/api/rooms/${encodeURIComponent(currentRoom)}/messages?limit=50`);
+      if (!response.ok) throw new Error("History unavailable");
+      const data = await response.json();
+      data.forEach(addMessage);
+    } catch (e) { /* the room still works if history is not configured */ }
+  }
+  function joinRoom(roomId) {
+    currentRoom = roomId;
+    document.querySelectorAll(".room").forEach(b => b.classList.toggle("active", b.dataset.room === roomId));
+    document.getElementById("roomTitle").textContent = rooms[roomId].name;
+    document.getElementById("roomSubtitle").textContent = rooms[roomId].description;
+    document.getElementById("roomHeadIcon").textContent = rooms[roomId].icon;
+    clearMessages();
+    if (joined && ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({type:"join", roomId}));
+    loadHistory();
+    shell.classList.add("room-open");
+  }
+  function connect() {
+    currentUser = nameInput.value.trim().slice(0,80);
+    if (!currentUser) { nameInput.focus(); notify("Add your name first."); return; }
+    if (ws && ws.readyState === WebSocket.OPEN) return;
+    connectButton.disabled = true; connectButton.textContent = "Connecting…";
+    const protocol = location.protocol === "https:" ? "wss:" : "ws:";
+    ws = new WebSocket(`${protocol}//${location.host}/hello`);
+    ws.onopen = () => {
+      joined = true; nameInput.disabled = true; connectButton.textContent = "Connected";
+      messageInput.disabled = false; sendButton.disabled = false;
+      document.getElementById("profileName").textContent = currentUser;
+      setAvatar(avatarUrl); updateStatus(true, "Connected");
+      ws.send(JSON.stringify({type:"join", roomId:currentRoom}));
+      notify("You're in. Say hello.");
+    };
+    ws.onmessage = event => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type === "message") addMessage(data);
+      } catch (e) { console.warn("Ignored invalid message", e); }
+    };
+    ws.onerror = () => notify("Could not connect. Check the server and try again.");
+    ws.onclose = () => {
+      joined = false; connectButton.disabled = false; connectButton.textContent = "Reconnect";
+      messageInput.disabled = true; sendButton.disabled = true; updateStatus(false, "Disconnected");
+    };
+  }
+  function sendMessage() {
+    const text = messageInput.value.trim();
+    if (!text) return;
+    if (!ws || ws.readyState !== WebSocket.OPEN || !joined) { notify("Join the chat before sending."); return; }
+    ws.send(JSON.stringify({type:"message", name:currentUser, message:text, roomId:currentRoom, avatarUrl}));
+    messageInput.value = ""; messageInput.focus();
+  }
+  async function uploadAvatar(file) {
+    if (!file) return;
+    if (!["image/jpeg","image/png","image/webp"].includes(file.type)) { notify("Use a JPG, PNG or WebP image."); return; }
+    if (file.size > 2 * 1024 * 1024) { notify("Choose an image under 2 MB."); return; }
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+      const reader = new FileReader();
+      reader.onload = () => { setAvatar(reader.result); notify("Preview only. Add Supabase settings to save it."); };
+      reader.readAsDataURL(file); return;
+    }
+    try {
+      const path = `avatars/${crypto.randomUUID()}-${file.name.replace(/[^a-zA-Z0-9._-]/g,"_")}`;
+      const response = await fetch(`${SUPABASE_URL}/storage/v1/object/${AVATAR_BUCKET}/${path}`, {
+        method:"POST", headers:{"Authorization":`Bearer ${SUPABASE_ANON_KEY}`,"apikey":SUPABASE_ANON_KEY,"Content-Type":file.type,"x-upsert":"false"}, body:file
+      });
+      if (!response.ok) throw new Error(await response.text());
+      avatarUrl = `${SUPABASE_URL}/storage/v1/object/public/${AVATAR_BUCKET}/${path}`;
+      setAvatar(avatarUrl); notify("Profile picture updated.");
+    } catch (e) { console.error(e); notify("Upload failed. Check your Supabase bucket policies."); }
+  }
+  document.querySelectorAll(".room").forEach(button => button.addEventListener("click", () => joinRoom(button.dataset.room)));
+  document.getElementById("backButton").addEventListener("click", () => shell.classList.remove("room-open"));
+  connectButton.addEventListener("click", connect);
+  document.getElementById("sendForm").addEventListener("submit", e => { e.preventDefault(); sendMessage(); });
+  nameInput.addEventListener("keydown", e => { if (e.key === "Enter") connect(); });
+  document.getElementById("themeToggle").addEventListener("click", toggleTheme);
+  document.getElementById("themeToggleMobile").addEventListener("click", toggleTheme);
+  function toggleTheme() {
+    const next = document.documentElement.dataset.theme === "light" ? "dark" : "light";
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem("echo-theme", next);
+  }
+  document.documentElement.dataset.theme = localStorage.getItem("echo-theme") || "dark";
+  document.getElementById("avatarButton").addEventListener("click", () => document.getElementById("avatarFile").click());
+  document.getElementById("avatarFile").addEventListener("change", e => uploadAvatar(e.target.files[0]));
+  joinRoom("general");
+</script>
+</body>
+</html>
