@@ -20,6 +20,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(socketConnectionHandler, "/hello")
                 // Restrict this to your deployed domain for production.
-                .setAllowedOriginPatterns("*");
+                .setAllowedOriginPatterns("https://echo-chatroom-n9ds.onrender.com/");
     }
 }
