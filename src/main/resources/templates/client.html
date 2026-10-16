@@ -5,7 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#111827">
   <title>Echo — conversations that feel alive</title>
+  <!-- Browser tab icon -->
+  <link rel="icon" type="image/svg+xml" href="/echo.svg">
+  <!-- Basic mobile browser settings -->
+  <meta name="theme-color" content="#10131c">
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="manifest" href="/manifest.webmanifest">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
   <style>
@@ -82,6 +87,24 @@
   </main>
 </div>
 <script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker
+              .register("/sw.js")
+              .then((registration) => {
+                console.log(
+                        "Echo service worker registered:",
+                        registration.scope
+                );
+              })
+              .catch((error) => {
+                console.error(
+                        "Echo service worker registration failed:",
+                        error
+                );
+              });
+    });
+  }
   // Set these two values to enable Supabase avatar uploads. Never use the service-role key here.
   const SUPABASE_URL = "https://ssqdgwsgykmlywlbdhca.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_s7jKxC7Wxktv-NNjijO9LA_ut5BTde2";
